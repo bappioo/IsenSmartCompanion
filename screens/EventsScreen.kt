@@ -18,7 +18,7 @@ fun EventsScreen(navController: NavController) {
     Scaffold(
         topBar = {
             Text(
-                text = "📅 Événements",
+                text = "Événements",
                 modifier = Modifier.padding(16.dp)
             )
         }
