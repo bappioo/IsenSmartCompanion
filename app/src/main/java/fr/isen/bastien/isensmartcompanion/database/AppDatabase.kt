@@ -1,11 +1,14 @@
-package fr.isen.bastien.isensmartcompanion.Room
+package fr.isen.bastien.isensmartcompanion.database
 
+import androidx.compose.foundation.interaction.Interaction
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
+import androidx.room.TypeConverters
 
-@Database(entities = [Entity::class], version = 1)
+@Database(entities = [Interaction::class], version = 1)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun interactionDao(): InteractionDao
 
