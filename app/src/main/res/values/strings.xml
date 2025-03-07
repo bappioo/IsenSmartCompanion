@@ -1,8 +1,15 @@
 <resources>
+// Main String
     <string name="app_name">ISENSmartCompanion</string>
     <string name="isen_logo">Isen Logo</string>
     <string name="bottom_navbar_home">Home</string>
     <string name="bottom_navbar_events">Evenements</string>
     <string name="bottom_navbar_history">Historique</string>
     <string name="title_activity_event_detail">EventDetailActivity</string>
+// History String
+    <string name="message_history">Message History</string>
+    <string name="delete_button">Delete All</string>
+    <string name="delete_description">Delete message</string>
+    <string name="user_id">User</string>
+    <string name="ai_id">AI</string>
 </resources>

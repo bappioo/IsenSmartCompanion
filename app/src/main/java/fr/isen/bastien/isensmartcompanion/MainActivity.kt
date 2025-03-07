@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import fr.isen.bastien.isensmartcompanion.database.Interaction
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -18,18 +19,21 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.ai.client.generativeai.GenerativeModel
 import fr.isen.bastien.isensmartcompanion.Models.EventModel
+import fr.isen.bastien.isensmartcompanion.database.AppDatabase
 import fr.isen.bastien.isensmartcompanion.screens.EventsScreen
 import fr.isen.bastien.isensmartcompanion.screens.HistoryScreen
 import fr.isen.bastien.isensmartcompanion.screens.MainScreen
 import fr.isen.bastien.isensmartcompanion.screens.TabView
 import fr.isen.bastien.isensmartcompanion.ui.theme.ISENSmartCompanionTheme
 import kotlinx.coroutines.launch
+import java.util.Date
 
 data class TabBarItem(
     val title: String,
@@ -48,11 +52,13 @@ class MainActivity : ComponentActivity() {
             val eventsTab = TabBarItem(title = getString(R.string.bottom_navbar_events), selectedIcon = Icons.Filled.Notifications, unselectedIcon = Icons.Outlined.Notifications)
             val historyTab = TabBarItem(title = getString(R.string.bottom_navbar_history), selectedIcon = Icons.Filled.List, unselectedIcon = Icons.Outlined.List)
 
-            // creating a list of all the tabs
             val tabBarItems = listOf(homeTab, eventsTab, historyTab)
 
-            // creating our navController
             val navController = rememberNavController()
+
+            val db by lazy {
+                AppDatabase.getDatabase(this)
+            }
 
             ISENSmartCompanionTheme {
                 Scaffold( bottomBar = {
@@ -73,7 +79,7 @@ class MainActivity : ComponentActivity() {
                               )
                           }
                           composable(historyTab.title) {
-                              HistoryScreen(innerPadding)
+                              HistoryScreen(innerPadding, context = LocalContext.current)
                           }
                       }
 
@@ -82,23 +88,38 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val db by lazy {
+        AppDatabase.getDatabase(this)
+    }
+
     @SuppressLint("SecretInSource")
     private val generativeModel = GenerativeModel(
-        modelName = "gemini-1.5-flash", // ou "gemini-pro"
-        apiKey = "AIzaSyBTn44myQznoJpHKbMrrlrJbY-i45PrZsA"
+        modelName = "gemini-1.5-flash",
+        apiKey = "AIzaSyBTn44myQznoJpHKbMrrlrJbY-i45PrZsA" //Clé API
     )
+    private fun saveInteraction(question: String, answer: String) {
+        lifecycleScope.launch {
+            val interaction = Interaction(
+                question = question,
+                answer = answer,
+                date = Date()
+            )
+            db.interactionDao().insert(interaction)
+        }
+    }
 
     fun analyzeTextWithAI(userInput: String, onResponse: (String) -> Unit) {
         lifecycleScope.launch {
             try {
                 val response = generativeModel.generateContent(userInput)
+
                 val responseText = response.text
                 if (responseText != null) {
                     Log.d("GeminiResponse", responseText)
                     onResponse(responseText)
                 } else {
-                    Log.e("GeminiError", "La réponse de l'IA est null")
-                    onResponse("Erreur : Aucune réponse de l'IA")
+                    Log.e("GeminiError", "La réponse de ISEN IA est null")
+                    onResponse("Erreur : Aucune réponse de ISEN IA")
                 }
             } catch (e: Exception) {
                 Log.e("GeminiError", "Error: ${e.message}")

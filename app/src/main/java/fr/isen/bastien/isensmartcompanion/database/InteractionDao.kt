@@ -1,6 +1,5 @@
 package fr.isen.bastien.isensmartcompanion.database
 
-import androidx.compose.foundation.interaction.Interaction
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query

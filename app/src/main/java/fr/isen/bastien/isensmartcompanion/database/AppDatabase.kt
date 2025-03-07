@@ -1,31 +1,11 @@
 package fr.isen.bastien.isensmartcompanion.database
 
-import androidx.compose.foundation.interaction.Interaction
+import android.app.Notification
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
-import android.content.Context
-import androidx.room.TypeConverters
+import fr.isen.bastien.isensmartcompanion.Dao.MessageDao
 
-@Database(entities = [Interaction::class], version = 1)
-@TypeConverters(Converters::class)
+@Database(entities = [Notification.MessagingStyle.Message::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun interactionDao(): InteractionDao
-
-    companion object {
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "interaction_database"
-                ).build()
-                INSTANCE = instance
-                instance
-            }
-        }
-    }
+    abstract fun messageDao(): MessageDao
 }
